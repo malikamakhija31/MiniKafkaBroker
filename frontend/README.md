@@ -1,16 +1,44 @@
-# React + Vite
+# MiniKafkaBroker – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
+MiniKafkaBroker is a real-time dashboard built using React and Vite to monitor and interact with the MiniKafkaBroker cluster.
 
-Currently, two official plugins are available:
+## Features
+- React-based dashboard interface
+- Real-time broker event monitoring using WebSocket
+- Live stream connection status
+- Dashboard UI for monitoring the broker cluster
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Technology Stack
+- React
+- Vite
+- JavaScript
+- CSS
+- WebSocket
 
-## React Compiler
+## Installation
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+Navigate to the frontend directory:
 
-## Expanding the ESLint configuration
+```bash
+cd frontend
+npm install
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Run the Frontend
+
+```bash
+npm run dev
+```
+
+Open the local URL displayed in the terminal, usually:
+
+```text
+http://localhost:5173
+```
+
+## Backend Requirement
+The MiniKafkaBroker FastAPI backend must be running for the dashboard to communicate with the broker cluster.
+
+## Note
+This README describes the frontend component of the MiniKafkaBroker project.
