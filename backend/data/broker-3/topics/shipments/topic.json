@@ -1,5 +1,0 @@
-{
-    "name": "shipments",
-    "partitions": 3,
-    "segment_max_bytes": 1048576
-}

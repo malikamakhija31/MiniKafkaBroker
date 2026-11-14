@@ -33,6 +33,9 @@ class ProduceRequest(BaseModel):
         default_factory=dict
     )
 
+    # Optional: retrying with the same token can never create a duplicate.
+    idempotency_key: str | None = Field(default=None, max_length=128)
+
 
 class CommitOffsetRequest(BaseModel):
 

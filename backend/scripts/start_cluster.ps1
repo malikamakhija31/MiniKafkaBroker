@@ -14,7 +14,7 @@ foreach ($node in $nodes) {
     $port = $node.Port
     $dataDir = "data/$id"
 
-    $command = "Set-Location -LiteralPath '$backendPath'; `$env:BROKER_NODE_ID='$id'; `$env:BROKER_DATA_DIR='$dataDir'; `$env:BROKER_CLUSTER_STATE='data/cluster_state.json'; python -m uvicorn app.main:app --host 127.0.0.1 --port $port --ws wsproto"
+    $command = "Set-Location -LiteralPath '$backendPath'; `$env:BROKER_NODE_ID='$id'; `$env:BROKER_DATA_DIR='$dataDir'; `$env:BROKER_CLUSTER_STATE='data/cluster_state.json'; `$env:BROKER_MIN_ISR='2'; `$env:BROKER_ENABLE_FAULTS='1'; python -m uvicorn app.main:app --host 127.0.0.1 --port $port --ws wsproto"
 
     Start-Process -FilePath "powershell.exe" -ArgumentList @(
         "-NoExit",

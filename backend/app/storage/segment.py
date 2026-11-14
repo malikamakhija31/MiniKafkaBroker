@@ -11,6 +11,21 @@ from app.models.record import Record
 from app.storage.segment_index import SegmentIndex
 
 
+def record_meta(record: Record):
+    """Small in-memory summary kept for records that matter to reliability
+    (idempotency token, transaction id, control markers)."""
+    if not (record.idempotency_key or record.txn_id or record.record_type != "DATA"):
+        return None
+    return {
+        "offset": record.offset,
+        "idempotency_key": record.idempotency_key,
+        "txn_id": record.txn_id,
+        "record_type": record.record_type,
+        "timestamp": record.timestamp.isoformat(),
+        "anchor": record.headers.get("txn_anchor"),
+    }
+
+
 class Segment:
 
     def __init__(self, file_path: str):
@@ -26,6 +41,7 @@ class Segment:
         )
 
         self.lock = asyncio.Lock()
+        self.recovered = []
 
         # Rebuild the index from the actual log on startup.
         self._recover()
@@ -89,12 +105,44 @@ class Segment:
                     "size": frame_size
                 })
 
+                meta = record_meta(record)
+                if meta:
+                    self.recovered.append(meta)
+
                 valid_position = file.tell()
 
             # Remove an incomplete or corrupted trailing record.
             file.truncate(valid_position)
 
         self.index.rebuild(entries)
+
+    @property
+    def base_offset(self) -> int:
+        return int(self.file_path.stem)
+
+    def truncate_from(self, offset: int) -> int:
+        """Physically drop every record with offset >= `offset` (sync; the
+        caller holds the partition lock). Used to discard a divergent or
+        uncommitted tail when a broker rejoins the cluster."""
+        entries = self.index.entries
+        keep = [entry for entry in entries if entry["offset"] < offset]
+        removed = len(entries) - len(keep)
+        if removed == 0:
+            return 0
+        cut_position = entries[len(keep)]["position"]
+        with open(self.file_path, "r+b") as file:
+            file.truncate(cut_position)
+            file.flush()
+            os.fsync(file.fileno())
+        self.index.rebuild(keep)
+        return removed
+
+    def delete_files(self):
+        for path in (self.file_path, self.index.file_path):
+            try:
+                path.unlink()
+            except FileNotFoundError:
+                pass
 
     def _write_record(self, record: Record):
 
