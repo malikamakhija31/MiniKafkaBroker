@@ -27,6 +27,7 @@ HEARTBEAT_SECONDS = float(os.getenv("BROKER_HEARTBEAT_SECONDS", "1.0"))
 FAILURE_THRESHOLD = int(os.getenv("BROKER_FAILURE_THRESHOLD", "3"))  # missed heartbeats => DOWN
 TXN_TIMEOUT_SECONDS = float(os.getenv("BROKER_TXN_TIMEOUT_SECONDS", "15"))
 PRODUCE_ATTEMPTS = 4
+DEMO_EVENT_DELAY = float(os.getenv("DEMO_EVENT_DELAY", "0"))
 
 CRASH_POINTS = ("after_event_1", "after_event_2", "after_event_3", "after_event_4", "after_decision")
 
@@ -878,7 +879,8 @@ class ClusterManager:
                         idempotency_key=event["idempotency_key"], txn_id=txn_id,
                     )
                     results.append({"topic": event["topic"], "event_type": event["value"].get("event_type"),
-                                    "result": result})
+                    "result": result})
+                    self._maybe_crash(f"after_event_{index}")
                     self._maybe_crash(f"after_event_{index}")
             except IdempotencyConflict:
                 raise
