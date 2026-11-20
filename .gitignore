@@ -1,3 +1,30 @@
-backend/data/
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.coverage
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Frontend
+node_modules/
+dist/
+
+# Broker data and logs
+backend/data/
+backend/logs/
+logs/
+
+# Credentials
+*.pem
+*.key
+
+# OS files
+.DS_Store
+Thumbs.db
